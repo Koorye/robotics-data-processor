@@ -122,6 +122,10 @@ def main(args):
     merge_datasets(source_roots, save_root, default_fps=args.fps)
     print(f'Merged dataset saved to {args.repo_id}')
 
+    for source_root in source_roots:
+        shutil.rmtree(source_root)
+        print(f'Removed temporary dataset {source_root}')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
