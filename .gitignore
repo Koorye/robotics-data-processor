@@ -1,0 +1,8 @@
+lerobot
+data/*
+outputs/*
+videos/*
+
+.vscode/*
+__pycache__/*
+*.pyc
