@@ -47,9 +47,13 @@ def visualize_lerobot(repo_id):
         state = data["state"]
         action = data["action"]
 
-        print(f'Episode: {episode}, Step: {step}')
-        print('State:', ' '.join([f'{s:.2f}' for s in state]))
-        print('Action:', ' '.join([f'{a:.2f}' for a in action]))
+        # print(f'Episode: {episode}, Step: {step}')
+        # import math
+        # print(state[50:57] * 180 / math.pi)
+        # print(state[0:7] * 180 / math.pi)
+        # print(state[60], state[10])
+        # print('State:', ' '.join([f'{s:.2f}' for s in state]))
+        # print('Action:', ' '.join([f'{a:.2f}' for a in action]))
 
         plt.clf()
         for i, (key, frame) in enumerate(frames.items()):
@@ -59,7 +63,7 @@ def visualize_lerobot(repo_id):
             plt.axis('off')
         
         plt.suptitle(f'Episode: {episode}, Step: {step}\nState: {" ".join([f"{s:.2f}" for s in state])}\nAction: {" ".join([f"{a:.2f}" for a in action])}')
-        plt.pause(0.1)
+        plt.pause(0.05)
 
 
 if __name__ == '__main__':

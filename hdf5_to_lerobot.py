@@ -72,12 +72,23 @@ def create_lerobot_dataset(repo_id, example_data, **kwargs) -> LeRobotDataset:
     return LeRobotDataset.create(repo_id, features=features, **kwargs)
 
 
-def extract_action(action):
+def extract_joint(state):
     return np.concatenate([
-        action[..., 50:57], # left joint
-        action[..., 60:61], # left gripper
-        action[..., 0:7],   # right joint
-        action[..., 10:11], # right gripper
+        state[..., 50:57], # left joint
+        state[..., 60:61], # left gripper
+        state[..., 0:7],   # right joint
+        state[..., 10:11], # right gripper
+    ], axis=-1)
+
+
+def extract_pose(state):
+    return np.concatenate([
+        state[..., 80:83], # left xyz
+        state[..., 83:89], # left rpy
+        state[..., 60:61], # left gripper
+        state[..., 30:33], # right xyz
+        state[..., 33:39], # right rpy
+        state[..., 10:11], # right gripper
     ], axis=-1)
 
 
@@ -94,8 +105,8 @@ def load_hdf5(infile):
         action = f['action'][:]
 
         output = {
-            'observation.state': extract_action(state),
-            'action': extract_action(action),
+            'observation.state': extract_pose(state),
+            'action': extract_pose(action),
         }
         for key, value in images.items():
             output[f'observation.images.{key}'] = np.array(value)

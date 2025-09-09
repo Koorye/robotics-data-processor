@@ -43,7 +43,7 @@ from hdf5_to_lerobot import (
     hdf5_to_lerobot, 
     load_hdf5,
 )
-from merge import merge_datasets
+from merge_lerobot import merge_datasets
 
 
 def split_list(lst, n):
