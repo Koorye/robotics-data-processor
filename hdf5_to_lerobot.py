@@ -6,8 +6,8 @@ Examples:
 1. Basic usage:
 ```python
 python hdf5_to_lerobot.py \
-    --root data/of/your/hdf5/files \
-    --repo_id name/task \
+    --root data/realman/pass_bowl \
+    --repo_id realman/pass_bowl \
     --fps 30 \
     --video_backend pyav \
     --image_writer_threads 10 \
@@ -105,8 +105,8 @@ def load_hdf5(infile):
         action = f['action'][:]
 
         output = {
-            'observation.state': extract_pose(state),
-            'action': extract_pose(action),
+            'observation.state': extract_joint(state),
+            'action': extract_joint(action),
         }
         for key, value in images.items():
             output[f'observation.images.{key}'] = np.array(value)
