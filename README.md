@@ -16,6 +16,10 @@ Visualize LeRobot:
 python scripts/visualize_lerobot.py --repo_id your/lerobot/repo_id
 ```
 
+This script will open a window like:
+
+![](examples/visualize_lerobot.png)
+
 ## Annotators
 
 Annotate LeRobot:
