@@ -54,6 +54,7 @@ def parse_hdf5(f):
         output[f'observation.images.{key}'] = np.array(value)
     return as_frames(output)
 
+
 class HDF5DataConvertor(BaseDataConvertor):
     def __init__(self, config: HDF5DataConvertorConfig):
         super().__init__(config)
