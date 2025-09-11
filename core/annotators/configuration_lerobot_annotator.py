@@ -50,22 +50,22 @@ class LerobotAnnotatorConfig:
             'name': 'position_aligned_left',
             'window_size': 1,
             'position_key': 'position_left',
-            'rotation_euler': (0, 0.25 * math.pi, 0.5 * math.pi),
+            'rotation_euler': (0, 0, 0.5 * math.pi),
         }, {
             'type': 'position_rotation',
             'name': 'position_aligned_right',
             'window_size': 1,
             'position_key': 'position_right',
-            'rotation_euler': (0, -0.25 * math.pi, 0.5 * math.pi),
+            'rotation_euler': (0, 0, 0.5 * math.pi),
         }, {
             'type': 'movement',
             'name': 'movement_left',
-            'window_size': 10,
+            'window_size': 3,
             'position_key': 'position_aligned_left',
         }, {
             'type': 'movement',
             'name': 'movement_right',
-            'window_size': 10,
+            'window_size': 3,
             'position_key': 'position_aligned_right',
         }, {
             'type': 'velocity', 
@@ -80,22 +80,22 @@ class LerobotAnnotatorConfig:
         }, {
             'type': 'acceleration',
             'name': 'acceleration_left',
-            'window_size': 5,
+            'window_size': 2,
             'vel_key': 'velocity_left',
         }, {
             'type': 'acceleration',
             'name': 'acceleration_right',
-            'window_size': 5,
+            'window_size': 2,
             'vel_key': 'velocity_right',
         }, {
             'type': 'gripper_movement',
             'name': 'gripper_movement_left',
-            'window_size': 10,
+            'window_size': 3,
             'gripper_key': 'gripper_left',
         }, {
             'type': 'gripper_movement',
             'name': 'gripper_movement_right',
-            'window_size': 10,
+            'window_size': 3,
             'gripper_key': 'gripper_right',
         }, {
             'type': 'gripper_summary',
@@ -111,10 +111,12 @@ class LerobotAnnotatorConfig:
             'type': 'movement_summary',
             'name': 'movement_summary_left',
             'movement_key': 'movement_left',
+            'threshold': 1e-3,
         }, {
             'type': 'movement_summary',
             'name': 'movement_summary_right',
             'movement_key': 'movement_right',
+            'threshold': 1e-3,
         }, {
             'type': 'gripper_movement_summary',
             'name': 'gripper_movement_summary_left',

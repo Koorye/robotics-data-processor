@@ -23,12 +23,11 @@ def get_lerobot_default_root():
 class BaseDataConvertor(ABC):
     def __init__(self, config: DataConvertorConfig):
         self.config = config
+        self.dataset = None
 
         if self.config.overwrite:
             self._check_overwrite()
         
-        self.create_dataset()
-    
     @abstractmethod
     def _yield_episodes(self) -> List[Dict[str, Any]]:
         """
@@ -56,54 +55,43 @@ class BaseDataConvertor(ABC):
                     return
                 shutil.rmtree(data_root, ignore_errors=True)
 
-    def create_dataset(self):
-        if self.config.check_only:
-            print('Check only mode, skipping dataset creation.')
-            return
-        
-        image_config = {
-            'dtype': self.config.image_dtype,
-            'shape': (self.config.image_height, self.config.image_width, 3),
-            'names': ['height', 'width', 'channel'],
-        }
-        features = {image_name: image_config for image_name in self.config.image_names}
+    def create_dataset(self, example_data: dict[str, np.ndarray]):
+        image_dtype = 'video' if self.config.video_backend != 'none' else 'image'
+        features = {}
+        for key, value in example_data.items():
+            if key.startswith(self.config.image_prefix):
+                features[key] = {
+                    'dtype': image_dtype,
+                    'shape': value.shape,
+                    'names': ['height', 'width', 'channel'],
+                }
+            else:
+                features[key] = {
+                    'dtype': str(value.dtype),
+                    'shape': value.shape,
+                    'names': [key],
+                }
 
-        depth_config = {
-            'dtype': self.config.depth_dtype,
-            'shape': (self.config.depth_height, self.config.depth_width),
-            'name': ['height', 'width'],
-        }
-        for depth_name in self.config.depth_names:
-            features[depth_name] = depth_config
-
-        features[self.config.action_key] = {
-            'dtype': self.config.action_dtype,
-            'shape': (self.config.action_len,),
-            'names': self.action_names,
-        }
-
-        features[self.config.state_key] = {
-            'dtype': self.config.state_dtype,
-            'shape': (self.config.action_len,),
-            'names': self.state_names,
-        }
-        
-        if self.config.data_root is not None:
-            self.config.data_root = os.path.join(self.config.data_root, self.config.repo_id)
-        
         self.dataset = LeRobotDataset.create(
             repo_id=self.config.repo_id,
             root=self.config.data_root,
             fps=self.config.fps,
+            use_videos=True if self.config.video_backend != 'none' else False,
             video_backend=self.config.video_backend,
+            image_writer_processes=self.config.image_writer_processes,
+            image_writer_threads=self.config.image_writer_threads,
             features=features,
         )
     
-    def process_data(self):
+    def convert(self):
         for episode in self._yield_episodes():
             if self.config.check_only:
                 print('Check only mode, skipping data processing.')
                 continue
+        
+            if self.dataset is None:
+                self.create_dataset(episode[0])
+            
             for frame in episode:
                 task = frame.get('task', self.config.default_task)
                 self.dataset.add_frame(frame, task=task)

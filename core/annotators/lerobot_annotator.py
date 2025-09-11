@@ -1,8 +1,6 @@
 import json
 import os
-import time
 from pyarrow import parquet
-# from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 from .configuration_lerobot_annotator import LerobotAnnotatorConfig
 from .operators import make_operator_from_config

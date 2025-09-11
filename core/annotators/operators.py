@@ -333,24 +333,37 @@ class AccelerationSummaryOperator(BaseOperator):
     def __init__(
         self,
         acceleration_key,
-        decel_threshold=-1e-4,
-        accel_threshold=1e-4,
+        threshold=1e-4,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.accel_key = acceleration_key
-        self.decel_threshold = decel_threshold
-        self.accel_threshold = accel_threshold
+        self.threshold = threshold
 
     def _operate(self, frame_window, annotation_window):
         accel = annotation_window[-1][self.accel_key]
-        if accel < self.decel_threshold:
+        if accel < -self.threshold:
             return 'decelerating'
-        elif accel > self.accel_threshold:
+        elif accel > self.threshold:
             return 'accelerating'
         else:
             return 'constant'
+
+
+class KeepAnnotationOperator(BaseOperator):
+    def __init__(
+        self,
+        keys,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.keys = keys
+    
+    def _operate(self, frame_window, annotation_window):
+        curr_annotation = annotation_window[-1]
+        return {key: curr_annotation[key] for key in self.keys if key in curr_annotation}
 
 
 def make_operator_from_config(config):
@@ -385,5 +398,7 @@ def make_operator_from_config(config):
         return VelocitySummaryOperator(**config)
     elif op_type == 'acceleration_summary':
         return AccelerationSummaryOperator(**config)
+    elif op_type == 'keep_annotation':
+        return KeepAnnotationOperator(**config)
     else:
         raise ValueError(f"Unknown operator type: {op_type}")

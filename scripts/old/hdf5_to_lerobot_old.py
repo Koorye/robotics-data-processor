@@ -6,12 +6,13 @@ Examples:
 1. Basic usage:
 ```python
 python hdf5_to_lerobot.py \
-    --root data/realman/pass_bowl \
-    --repo_id realman/pass_bowl \
+    --root data/realman/eval_v1 \
+    --repo_id realman/eval_v1_pose \
     --fps 30 \
     --video_backend pyav \
     --image_writer_threads 10 \
-    --image_writer_processes 5
+    --image_writer_processes 5 \
+    --max_episodes 3
 ```
 
 2. Limit the number of episodes:
@@ -105,8 +106,10 @@ def load_hdf5(infile):
         action = f['action'][:]
 
         output = {
-            'observation.state': extract_joint(state),
-            'action': extract_joint(action),
+            # 'observation.state': extract_joint(state),
+            # 'action': extract_joint(action),
+            'observation.state': extract_pose(state),
+            'action': extract_pose(action),
         }
         for key, value in images.items():
             output[f'observation.images.{key}'] = np.array(value)
