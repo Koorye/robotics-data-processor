@@ -103,3 +103,9 @@ Visualize annotation:
 ```bash
 python scripts/visualize_annotation.py --repo_id your/lerobot/repo_id
 ```
+
+This script will open a window like:
+
+![](examples/visualize_annotation.png)
+
+You can press left/right direction key to switch frame.
