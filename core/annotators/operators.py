@@ -379,7 +379,6 @@ class SceneDescriptionOperator(BaseOperator):
     def __init__(
         self, 
         scene_description_dir,
-        task_meta_path,
         *args,
         **kwargs,
     ):
