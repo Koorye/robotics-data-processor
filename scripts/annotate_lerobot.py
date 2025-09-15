@@ -160,7 +160,6 @@ if __name__ == '__main__':
                 'type': 'scene_description',
                 'name': 'scene_description',
                 'scene_description_dir': 'data/annotations/scenes',
-                'task_meta_path': 'lerobot/realman/eval_v1_anno/meta/tasks.jsonl',
 
             }, {
                 'type': 'subtask',

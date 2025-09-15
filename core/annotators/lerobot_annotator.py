@@ -13,6 +13,9 @@ def get_default_lerobot_root():
 class LerobotAnnotator:
     def __init__(self, config: LerobotAnnotatorConfig):
         self.config = config
+        for op_cfg in config.operators:
+            if 'repo_id' not in op_cfg:
+                op_cfg['repo_id'] = config.repo_id
         self.operators = [make_operator_from_config(op_cfg) for op_cfg in config.operators]
 
     def annotate(self):

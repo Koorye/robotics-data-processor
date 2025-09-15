@@ -15,13 +15,19 @@ from .transforms import (
 )
 
 
+def get_default_lerobot_root():
+    return os.path.join(os.path.expanduser('~'), '.cache', 'huggingface', 'lerobot')
+
+
 class BaseOperator(ABC):
     def __init__(
         self, 
         name,
+        repo_id,
         window_size=1, 
     ):
         self.name = name
+        self.repo_id = repo_id
         self.window_size = window_size
     
     @abstractmethod
@@ -379,7 +385,7 @@ class SceneDescriptionOperator(BaseOperator):
     ):
         super().__init__(*args, **kwargs)
         self._scene_descriptions = self._load_scene_descriptions(scene_description_dir)
-        self._task_meta = self._load_task_meta(task_meta_path)
+        self._task_meta = self._load_task_meta(os.path.join(get_default_lerobot_root(), self.repo_id, 'meta', 'tasks.jsonl'))
     
     def _operate(self, frame_window, annotation_window):
         task_index = annotation_window[-1]['task_index']
@@ -431,7 +437,6 @@ class SubtaskOperator(BaseOperator):
         annotations = {}
         for episode in data:
             episode_index = int(episode['video'].split('episode_')[1].split('.')[0])
-            print(episode_index, episode.keys())
             subtasks = episode['videoLabels']
             subtasks = [
                 (
