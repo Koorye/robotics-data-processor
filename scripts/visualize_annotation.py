@@ -164,14 +164,14 @@ def show_videos_with_annotation(videos, annotations):
 
 def main(args):
     episodes = find_episodes(args.repo_id)  # To check if the repo exists
-    for episode in episodes[10:]:
-        videos = load_videos(args.repo_id, episode['episode_index'])
-        annotation = load_annotation(args.repo_id, episode['episode_index'])
-        show_videos_with_annotation(videos, annotation)
+    videos = load_videos(args.repo_id, args.episode_index)
+    annotation = load_annotation(args.repo_id, args.episode_index)
+    show_videos_with_annotation(videos, annotation)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--repo_id', type=str, required=True)
+    parser.add_argument('--episode_index', type=int, required=True)
     args = parser.parse_args()
     main(args)

@@ -1327,8 +1327,8 @@ if __name__ == "__main__":
     # Add arguments
     parser.add_argument("--sources", nargs="+", required=True, help="List of source folder paths")
     parser.add_argument("--output", required=True, help="Output folder path")
-    parser.add_argument("--max_dim", type=int, default=32, help="Maximum dimension (default: 32)")
-    parser.add_argument("--fps", type=int, default=20, help="Your datasets FPS (default: 20)")
+    parser.add_argument("--max_dim", type=int, default=34, help="Maximum dimension (default: 32)")
+    parser.add_argument("--fps", type=int, default=30, help="Your datasets FPS (default: 20)")
 
     # Parse arguments
     args = parser.parse_args()
