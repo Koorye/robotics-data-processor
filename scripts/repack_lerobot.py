@@ -2,14 +2,15 @@ import argparse
 import sys
 sys.path.append('.')
 
-from core.converters.hdf5_data_convertor import HDF5DataConvertor
-from core.converters.configuration_data_convertor import HDF5DataConvertorConfig
+from core.converters.configuration_data_convertor import LeRobotDataConvertorConfig
+from core.converters.lerobot_data_convertor import LeRobotDataConvertor
 
 
 def main(args):
-    config = HDF5DataConvertorConfig(
+    config = LeRobotDataConvertorConfig(
+        source_repo_id=args.source_repo_id,
+        source_video_backend=args.source_video_backend,
         repo_id=args.repo_id,
-        root=args.root,
         fps=args.fps,
         video_backend=args.video_backend,
         overwrite=args.overwrite,
@@ -19,13 +20,14 @@ def main(args):
         image_writer_processes=args.image_writer_processes,
         image_writer_threads=args.image_writer_threads,
     )
-    convertor = HDF5DataConvertor(config)
+    convertor = LeRobotDataConvertor(config)
     convertor.convert()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--root', type=str, required=True, help='Root directory containing HDF5 files.')
+    parser.add_argument('--source_repo_id', type=str, required=True, help='Source Lerobot repository ID to read the dataset.')
+    parser.add_argument('--source_video_backend', type=str, default='pyav', help='Video backend for source lerobot (pyav or torchcodec).')
     parser.add_argument('--repo_id', type=str, required=True, help='Lerobot repository ID to save the dataset.')
     parser.add_argument('--fps', type=int, default=30, help='Frames per second for the output videos.')
     parser.add_argument('--video_backend', type=str, default='pyav', help='Video backend for lerobot (pyav or torchcodec).')

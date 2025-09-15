@@ -22,3 +22,9 @@ class DataConvertorConfig:
 @dataclass
 class HDF5DataConvertorConfig(DataConvertorConfig):
     root: str = ''
+
+
+@dataclass
+class LeRobotDataConvertorConfig(DataConvertorConfig):
+    source_repo_id: str = ''
+    source_video_backend: str = 'pyav'

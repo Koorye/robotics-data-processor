@@ -1,5 +1,8 @@
 import copy
+import json
 import numpy as np
+import os
+import yaml
 from abc import ABC, abstractmethod
 
 from .transforms import (
@@ -366,6 +369,82 @@ class KeepAnnotationOperator(BaseOperator):
         return {key: curr_annotation[key] for key in self.keys if key in curr_annotation}
 
 
+class SceneDescriptionOperator(BaseOperator):
+    def __init__(
+        self, 
+        scene_description_dir,
+        task_meta_path,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self._scene_descriptions = self._load_scene_descriptions(scene_description_dir)
+        self._task_meta = self._load_task_meta(task_meta_path)
+    
+    def _operate(self, frame_window, annotation_window):
+        task_index = annotation_window[-1]['task_index']
+        task = self._task_meta[task_index].replace('.', '')
+        return self._scene_descriptions[task]
+
+    def _load_scene_descriptions(self, dir):
+        desc = {}
+        for file in os.listdir(dir):
+            if file.endswith('.yaml') or file.endswith('.yml'):
+                path = os.path.join(dir, file)
+                with open(path) as f:
+                    data = yaml.safe_load(f)
+                desc[file.split('.')[0]] = data['scene']
+        return desc
+    
+    def _load_task_meta(self, path):
+        with open(path) as f:
+            lines = f.readlines()
+        task_map = {}
+        for line in lines:
+            data = json.loads(line)
+            task_map[data['task_index']] = data['task']
+        return task_map
+
+
+class SubtaskOperator(BaseOperator):
+    def __init__(
+        self,
+        subtask_annotation_path,
+        *args,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self._annotations = self._load_subtask_annotations(subtask_annotation_path)
+    
+    def _operate(self, frame_window, annotation_window):
+        episode_index = annotation_window[-1]['episode_index']
+        frame_index = annotation_window[-1]['frame_index']
+        subtasks = self._annotations[episode_index]
+        for start, end, label in subtasks:
+            if start <= frame_index <= end:
+                return label
+        return 'none'
+    
+    def _load_subtask_annotations(self, path):
+        with open(path) as f:
+            data = json.load(f)
+        annotations = {}
+        for episode in data:
+            episode_index = int(episode['video'].split('episode_')[1].split('.')[0])
+            print(episode_index, episode.keys())
+            subtasks = episode['videoLabels']
+            subtasks = [
+                (
+                    subtask['ranges'][0]['start'] - 1,
+                    subtask['ranges'][0]['end'] - 1,
+                    subtask['timelinelabels'][0].lower()
+                )
+                for subtask in subtasks
+            ]
+            annotations[episode_index] = subtasks
+        return annotations
+
+
 def make_operator_from_config(config):
     op_type = config['type']
     del config['type']
@@ -400,5 +479,9 @@ def make_operator_from_config(config):
         return AccelerationSummaryOperator(**config)
     elif op_type == 'keep_annotation':
         return KeepAnnotationOperator(**config)
+    elif op_type == 'scene_description':
+        return SceneDescriptionOperator(**config)
+    elif op_type == 'subtask':
+        return SubtaskOperator(**config)
     else:
         raise ValueError(f"Unknown operator type: {op_type}")

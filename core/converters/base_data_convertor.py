@@ -65,7 +65,7 @@ class BaseDataConvertor(ABC):
                     'shape': value.shape,
                     'names': ['height', 'width', 'channel'],
                 }
-            else:
+            elif key != 'task':
                 features[key] = {
                     'dtype': str(value.dtype),
                     'shape': value.shape,
@@ -93,6 +93,11 @@ class BaseDataConvertor(ABC):
                 self.create_dataset(episode[0])
             
             for frame in episode:
-                task = frame.get('task', self.config.default_task)
+                if 'task' in frame:
+                    task = frame['task']
+                    del frame['task']
+                else:
+                    task = self.config.default_task
+
                 self.dataset.add_frame(frame, task=task)
             self.dataset.save_episode()

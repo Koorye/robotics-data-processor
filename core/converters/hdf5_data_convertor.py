@@ -7,6 +7,14 @@ from PIL import Image
 from .base_data_convertor import BaseDataConvertor
 from .configuration_data_convertor import HDF5DataConvertorConfig
 
+_TASK_MAPPING = {
+    'basket_towel': 'put the towel into in basket.',
+    'box_put_peach': 'open the box and put the peach in it.',
+    'close_drawer': 'put the peach in the drawer and close it.',
+    'fold_towel': 'fold the towel.',
+    'pass_bowl': 'pass the bowl from the left to the right.',
+}
+
 
 def decode_image(image_buffer):
     img = Image.open(io.BytesIO(image_buffer))
@@ -33,7 +41,20 @@ def extract_pose(state):
     ], axis=-1)
 
 
-def parse_hdf5(f):
+def extract_joint_and_pose(state):
+    return np.concatenate([
+        state[..., 50:57], # left joint [0, 7)
+        state[..., 60:61], # left gripper [7, 8)
+        state[..., 80:83], # left xyz [8, 11)
+        state[..., 83:89], # left rpy [11, 17)
+        state[..., 0:7],   # right joint [17, 24)
+        state[..., 10:11], # right gripper [24, 25)
+        state[..., 30:33], # right xyz [25, 28)
+        state[..., 33:39], # right rpy [28, 34)
+    ], axis=-1)
+
+
+def parse_hdf5(f, hdf5_path):
     def as_frames(output):
         # {'a': (N, ...), 'b': (N, ...)} -> [{'a': (...), 'b': (...)}, ...]
         return [dict(zip(output.keys(), t)) for t in zip(*output.values())]
@@ -45,13 +66,16 @@ def parse_hdf5(f):
     action = f['action'][:]
 
     output = {
-        # 'observation.state': extract_joint(state),
-        # 'action': extract_joint(action),
-        'observation.state': extract_pose(state),
-        'action': extract_pose(action),
+        'observation.state': extract_joint_and_pose(state),
+        'action': extract_joint_and_pose(action),
     }
     for key, value in images.items():
         output[f'observation.images.{key}'] = np.array(value)
+    
+    task = hdf5_path.replace('\\', '/').split('/')[-2]
+    task = _TASK_MAPPING[task]
+    output['task'] = [task for _ in range(len(state))]
+
     return as_frames(output)
 
 
@@ -70,6 +94,6 @@ class HDF5DataConvertor(BaseDataConvertor):
 
         for hdf5_path in hdf5_paths:
             with h5py.File(hdf5_path, 'r') as f:
-                result = parse_hdf5(f)
+                result = parse_hdf5(f, hdf5_path)
             
             yield result

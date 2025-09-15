@@ -34,11 +34,20 @@ class LerobotAnnotator:
             self._annotate_episode(episode)
     
     def _annotate_episode(self, episode):
-        annotation_path = os.path.join(get_default_lerobot_root(), self.config.repo_id, 'annotations', f'episode_{episode[0]["episode_index"]:06d}.json')
+        episode_index = episode[0]['episode_index']
+        annotation_path = os.path.join(get_default_lerobot_root(), self.config.repo_id, 'annotations', f'episode_{episode_index:06d}.json')
+        
         if os.path.exists(annotation_path):
             annotations = json.load(open(annotation_path, 'r'))
         else:
-            annotations = [{"frame_index": i} for i in range(len(episode))]
+            annotations = [
+                {
+                    "episode_index": episode_index, 
+                    "frame_index": i,
+                    "task_index": episode[i]['task_index'],
+                } 
+                for i in range(len(episode))
+            ]
         
         for operator in self.operators:
             annotations = operator.operate(episode, annotations)

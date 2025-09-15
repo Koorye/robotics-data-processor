@@ -14,44 +14,44 @@ def main(config: LerobotAnnotatorConfig):
 
 if __name__ == '__main__':
     config = LerobotAnnotatorConfig(
-        repo_id='realman/eval_v1_pose',
+        repo_id='realman/eval_v1_anno',
         operators=[
             {
                 'type': 'position',
                 'name': 'position_left',
                 'window_size': 1,
                 'state_key': 'observation.state',
-                'xyz_range': (0, 3),
+                'xyz_range': (8, 11),
             }, {
                 'type': 'position',
                 'name': 'position_right',
                 'window_size': 1,
                 'state_key': 'observation.state',
-                'xyz_range': (10, 13),
+                'xyz_range': (25, 28),
             }, {
                 'type': 'angle',
                 'name': 'angle_left',
                 'window_size': 1,
                 'state_key': 'observation.state',
-                'rpy_range': (3, 9),
+                'rpy_range': (11, 17),
             }, {
                 'type': 'angle',
                 'name': 'angle_right',
                 'window_size': 1,
                 'state_key': 'observation.state',
-                'rpy_range': (13, 19),
+                'rpy_range': (28, 34),
             }, {
                 'type': 'gripper',
                 'name': 'gripper_left',
                 'window_size': 1,
                 'state_key': 'observation.state',
-                'gripper_indice': 9,
+                'gripper_indice': 7,
             }, {
                 'type': 'gripper',
                 'name': 'gripper_right',
                 'window_size': 1,
                 'state_key': 'observation.state',
-                'gripper_indice': 19,
+                'gripper_indice': 24,
             }, {
                 'type': 'position_rotation',
                 'name': 'position_aligned_left',
@@ -156,6 +156,16 @@ if __name__ == '__main__':
                 'name': 'acceleration_summary_right',
                 'acceleration_key': 'acceleration_right',
                 'threshold': 2e-3,
+            }, {
+                'type': 'scene_description',
+                'name': 'scene_description',
+                'scene_description_dir': 'data/annotations/scenes',
+                'task_meta_path': 'lerobot/realman/eval_v1_anno/meta/tasks.jsonl',
+
+            }, {
+                'type': 'subtask',
+                'name': 'subtask',
+                'subtask_annotation_path': 'data/annotations/project-563-at-2025-09-11-12-06-18445096.json',
             }
         ]
     )
